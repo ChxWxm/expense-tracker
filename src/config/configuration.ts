@@ -8,5 +8,6 @@ export const configuration = () => {
       name: process.env.DB_NAME,
       isDevMode: process.env.IS_DEV_MODE === 'true',
     },
+    jwtSecret: process.env.JWT_SECRET,
   };
 };
