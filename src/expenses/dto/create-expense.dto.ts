@@ -7,7 +7,4 @@ export class CreateExpenseDto {
 
   @IsNumber()
   amount: number;
-
-  @IsNumber()
-  userId: number;
 }

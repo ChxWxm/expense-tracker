@@ -12,6 +12,9 @@ export class User {
   @Column()
   email: string;
 
+  @Column()
+  password: string;
+
   @OneToMany(() => Expense, (expense) => expense.user.id) // One user can have many expenses
   expenses: Expense[];
 }
