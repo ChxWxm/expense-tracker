@@ -1,20 +1,43 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from 'src/users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class UsersService {
+export class UsersService implements OnApplicationBootstrap {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly configService: ConfigService,
   ) {}
+  readonly SALT_ROUND = 10;
+
+  async onApplicationBootstrap() {
+    const count = await this.userRepository.count();
+    if (count === 0) {
+      // Seeding data
+      const adminEmail = this.configService.get<string>('admin.email') ?? '';
+      const adminPassword =
+        this.configService.get<string>('admin.password') ?? '';
+
+      const salt = await bcrypt.genSalt(this.SALT_ROUND);
+      const hashedPassword = await bcrypt.hash(adminPassword, salt);
+
+      const adminUser = this.userRepository.create({
+        username: 'AdminScorpio',
+        email: adminEmail,
+        password: hashedPassword,
+      });
+
+      await this.userRepository.save(adminUser);
+    }
+  }
 
   async create(createUserDto: CreateUserDto) {
-    const SALT_ROUND = 10;
-    const salt = await bcrypt.genSalt(SALT_ROUND);
+    const salt = await bcrypt.genSalt(this.SALT_ROUND);
     const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
 
     const newUser = this.userRepository.create({
