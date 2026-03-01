@@ -15,6 +15,7 @@ import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { ActiveUser } from '../auth/interfaces/active-user.interface';
+import { PaginationParams } from '../decorators/pagination.decorator';
 
 @Controller('expenses')
 @UseGuards(AuthGuard('jwt'))
@@ -32,8 +33,11 @@ export class ExpensesController {
   }
 
   @Get()
-  findAll(@CurrentUser() user: ActiveUser) {
-    return this.expensesService.findAllByUser(user.userId);
+  findAll(
+    @CurrentUser() user: ActiveUser,
+    @PaginationParams() pagination: { page: number; limit: number },
+  ) {
+    return this.expensesService.findAllByUser(user.userId, pagination);
   }
 
   @Get(':id')

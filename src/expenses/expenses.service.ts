@@ -4,6 +4,7 @@ import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Expense } from 'src/expenses/entities/expense.entity';
 import { Repository } from 'typeorm';
+import { paginationWithFilter } from '../utils/pagination.util';
 
 @Injectable()
 export class ExpensesService {
@@ -24,7 +25,14 @@ export class ExpensesService {
     return this.expenseRepository.find({ relations: ['user'] }); // Include user relation
   }
 
-  findAllByUser(userId: number) {
+  findAllByUser(userId: number, pagination: { page: number; limit: number }) {
+    return paginationWithFilter(this.expenseRepository, pagination, {
+      where: {
+        userId,
+      },
+      relations: ['user'],
+      order: { id: 'DESC' },
+    });
     return this.expenseRepository.find({
       where: {
         userId,
