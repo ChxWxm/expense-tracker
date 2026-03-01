@@ -9,5 +9,9 @@ export const configuration = () => {
       isDevMode: process.env.IS_DEV_MODE === 'true',
     },
     jwtSecret: process.env.JWT_SECRET,
+    admin: {
+      email: process.env.ADMIN_EMAIL,
+      password: process.env.ADMIN_PASSWORD,
+    },
   };
 };
